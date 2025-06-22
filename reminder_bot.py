@@ -5,6 +5,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from apscheduler.schedulers.background import BackgroundScheduler
 import logging
+import asyncio
 
 # Включаем логирование
 logging.basicConfig(level=logging.INFO)
@@ -113,17 +114,27 @@ async def delete_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ▶️ Запуск бота
 async def main():
+    # Читаем токен из переменной окружения
     token = os.getenv("BOT_TOKEN")
+    if not token:
+        logging.error("Токен бота не найден в переменных окружения!")
+        return
+
+    # Создаём приложение
     app = Application.builder().token(token).build()
 
+    # Добавляем обработчики команд
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("set", set_reminder))
     app.add_handler(CommandHandler("list", list_reminders))
     app.add_handler(CommandHandler("delete", delete_reminder))
 
     print("✅ Бот запущен...")
+    # Запускаем polling и сохраняем задачу, чтобы дождаться её завершения
     await app.run_polling()
 
+    # Завершаем работу (опционально, если нужно явно закрыть)
+    await app.shutdown()
+
 if __name__ == '__main__':
-    import asyncio
     asyncio.run(main())
