@@ -113,7 +113,8 @@ async def delete_reminder(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ▶️ Запуск бота
 async def main():
-    app = Application.builder().token("7621419938:AAEopXdj4UX-cmzjR_RcRoFjQKZgmOGriHI").build()
+    token = os.getenv("BOT_TOKEN")
+    app = Application.builder().token(token).build()
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("set", set_reminder))
